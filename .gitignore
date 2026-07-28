@@ -19,3 +19,9 @@ vite.config.js
 vite.config.d.ts
 *.tsbuildinfo
 mobile-*.png
+
+.claude/skills/
+.secrets.local
+*.local
+__pycache__/
+*.pyc

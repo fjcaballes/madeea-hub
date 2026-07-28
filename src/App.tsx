@@ -6,6 +6,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Tasks from "@/pages/Tasks";
+import EodReports from "@/pages/EodReports";
 import Communication from "@/pages/Communication";
 import QuickActions from "@/pages/QuickActions";
 import ClientVault from "@/pages/ClientVault";
@@ -44,6 +45,7 @@ function Gate() {
       <Route element={<AppShell />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/tasks" element={<Tasks />} />
+        <Route path="/eod" element={<EodReports />} />
         <Route path="/communication" element={<Communication />} />
         <Route path="/quick-actions" element={<QuickActions />} />
         <Route path="/clients" element={<ClientVault />} />

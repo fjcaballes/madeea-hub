@@ -21,6 +21,15 @@ export const GUIDES: Record<string, Guide> = {
       "Hover a card for the ✏️ edit and 🗑️ delete controls.",
     ],
   },
+  "/eod": {
+    title: "How EOD Reports works",
+    points: [
+      "Every end-of-day report from the team sheet, with submission compliance, blockers and next-day plans in one place.",
+      "A cell only counts as a submission once it's actually filled in. The sheet pre-fills every cell with a blank template, and those don't count.",
+      "Completion % is the sheet's own figure (submissions ÷ 31 days), so it matches what you already see in the spreadsheet.",
+      "Filter by member, date, or “With blockers”, and expand any report to read the original text as submitted.",
+    ],
+  },
   "/communication": {
     title: "How the Communication Center works",
     points: [

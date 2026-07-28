@@ -66,6 +66,30 @@ export interface Task {
    * created it. Null is a legitimate state: nobody has picked it up yet.
    */
   assignee_id?: string | null;
+  /** Blocked and why (migration 0016). Rolls straight into the EOD draft. */
+  blocked?: boolean;
+  blocker_note?: string | null;
+}
+
+/**
+ * One submitted end-of-day report (migration 0016). Drafted from task activity,
+ * reviewed and submitted by a person — the submission is what compliance counts.
+ */
+export interface EodReport {
+  id: string;
+  owner_id: string;
+  report_date: string;
+  done: string[];
+  blockers: string[];
+  plans: string[];
+  notes?: string | null;
+  submitted_at?: string | null;
+  /** Resolved for display; the July import carries names, not auth users. */
+  person?: string;
+  /** Original sheet text, kept verbatim for imported July reports. */
+  raw?: string | null;
+  /** Deliverable URLs mentioned in the report. Parsed on import. */
+  links?: string[];
 }
 
 /** One reassignment, written by a DB trigger on every assignee_id change. */

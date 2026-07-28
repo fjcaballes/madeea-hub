@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import * as seed from "@/data/seed";
-import type { Task, TaskStatus, Client, Meeting, Message, Automation, Sop, SopRun, AutomationRun, Reminder, Snooze, TaskEvent } from "@/types/db";
+import type { Task, TaskStatus, Client, Meeting, Message, Automation, Sop, SopRun, AutomationRun, Reminder, Snooze, TaskEvent, EodReport } from "@/types/db";
 import type { ClientDoc } from "@/lib/meetingPrep";
 import type { MemoryEntry } from "@/lib/memory";
 import type { Note } from "@/lib/notes";
+import { IMPORTED_EOD } from "@/data/eodImport";
+import { loadDemoEod, saveDemoEod, removeDemoEod } from "@/store/demoEod";
 import { addDemoTask, loadDemoTasks, removeDemoTask, updateDemoTask } from "@/store/demoTasks";
 import { loadSnoozes, saveSnooze } from "@/store/demoSnoozes";
 import { loadAssignees, loadDemoTaskEvents, saveAssignee } from "@/store/demoAssignees";
@@ -72,7 +74,12 @@ export function useTaskMutations() {
 
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: TaskStatus }) => {
-      if (!supabase) { updateDemoTask(id, { status }); return; }
+      if (!supabase) {
+        // Live, a DB trigger stamps completed_at (migration 0014/0016). Demo has
+        // no trigger, so mirror it here or "completed today" can never populate.
+        updateDemoTask(id, { status, completed_at: status === "done" ? new Date().toISOString() : null });
+        return;
+      }
       const { error } = await supabase.from("tasks").update({ status }).eq("id", id);
       if (error) throw error;
       // Recurring tasks spawn their next instance on completion.
@@ -106,6 +113,9 @@ export function useTaskMutations() {
     subtasks?: Task["subtasks"]; recurrence?: Task["recurrence"]; depends_on?: string | null;
     client_id?: string | null;
     assignee_id?: string | null;
+    /** Declared blocker + reason (migration 0016). Feeds the EOD draft. */
+    blocked?: boolean;
+    blocker_note?: string | null;
   };
   const create = useMutation({
     mutationFn: async (input: TaskInput) => {
@@ -121,6 +131,13 @@ export function useTaskMutations() {
           subtasks: input.subtasks ?? [],
           recurrence: input.recurrence ?? "none",
           depends_on: input.depends_on ?? null,
+          // Demo mode dropped these, so a task created here belonged to nobody
+          // and its blocker vanished — which left the EOD draft empty.
+          client_id: input.client_id ?? null,
+          assignee_id: input.assignee_id ?? null,
+          blocked: input.blocked ?? false,
+          blocker_note: input.blocker_note ?? null,
+          completed_at: null,
         });
         return;
       }
@@ -129,6 +146,8 @@ export function useTaskMutations() {
         subtasks: input.subtasks ?? [], recurrence: input.recurrence ?? "none", depends_on: input.depends_on ?? null,
         client_id: input.client_id ?? null,
         assignee_id: input.assignee_id ?? null,
+        blocked: input.blocked ?? false,
+        blocker_note: input.blocker_note ?? null,
       });
       if (error) throw error;
     },
@@ -931,6 +950,81 @@ export function useAssignTask() {
       qc.invalidateQueries({ queryKey: ["tasks"] });
       qc.invalidateQueries({ queryKey: ["task_events"] });
     },
+  });
+}
+
+// ---------------- EOD reports ----------------
+
+/**
+ * Every EOD report: the imported July sheet history plus anything submitted
+ * since. Falls back to the July import alone when the table isn't migrated yet
+ * or we're in demo mode, so the page never goes blank.
+ */
+export function useEodReports() {
+  return useQuery<EodReport[]>({
+    queryKey: ["eod_reports"],
+    queryFn: async () => {
+      if (!supabase) return [...IMPORTED_EOD, ...loadDemoEod()];
+      const { data, error } = await supabase
+        .from("eod_reports")
+        .select("id,owner_id,person_name,report_date,done,blockers,plans,notes,raw,submitted_at")
+        .order("report_date", { ascending: false });
+      if (error) return IMPORTED_EOD; // migration 0016 not applied yet
+      return (data as (Omit<EodReport, "person"> & { person_name: string })[]).map((r) => ({
+        ...r,
+        person: r.person_name,
+      }));
+    },
+    retry: false,
+  });
+}
+
+/** Submit (or correct) today's report. Upserts on person + date. */
+export function useSubmitEod() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (report: Omit<EodReport, "id" | "owner_id">) => {
+      if (!supabase) {
+        saveDemoEod({ ...report, id: demoId(), owner_id: "demo" } as EodReport);
+        return;
+      }
+      // owner_id defaults to auth.uid(), and a BEFORE trigger (migration 0019)
+      // overwrites person_name with the owner's profile name. So the value sent
+      // here is only a fallback: two devices on the same account, or a stale
+      // cached name, can no longer file under a second identity.
+      const { error } = await supabase.from("eod_reports").upsert(
+        {
+          person_name: report.person,
+          report_date: report.report_date,
+          done: report.done,
+          blockers: report.blockers,
+          plans: report.plans,
+          notes: report.notes ?? null,
+        },
+        { onConflict: "person_name,report_date" },
+      );
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["eod_reports"] }),
+  });
+}
+
+/**
+ * Delete a report. RLS decides who may: you can remove your own, and an admin
+ * can remove any — including the imported July rows, which have no owner.
+ */
+export function useDeleteEod() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      if (!supabase) {
+        removeDemoEod(id);
+        return;
+      }
+      const { error } = await supabase.from("eod_reports").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["eod_reports"] }),
   });
 }
 

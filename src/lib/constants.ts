@@ -9,6 +9,7 @@ import {
   Calculator,
   Plug,
   ClipboardCheck,
+  ClipboardList,
   GraduationCap,
   TrendingUp,
   Trophy,
@@ -35,6 +36,7 @@ export interface NavItem {
 export const NAV: NavItem[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, group: "Operations" },
   { to: "/tasks", label: "Task Manager", icon: CheckSquare, group: "Operations" },
+  { to: "/eod", label: "EOD Reports", icon: ClipboardList, group: "Operations" },
   { to: "/communication", label: "Communication Center", icon: Mail, group: "Operations" },
   { to: "/quick-actions", label: "AI Quick Actions", icon: Zap, group: "Operations" },
   { to: "/clients", label: "Client Vault", icon: Users, group: "Operations" },

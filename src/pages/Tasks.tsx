@@ -67,7 +67,14 @@ function CardBody({ task, blocked, onDelete, onEdit, overlay }: { task: Task; bl
       </p>
       <div className="mt-2 flex flex-wrap items-center gap-2 pl-6">
         <Badge tone={task.priority}>{priorityLabel[task.priority]}</Badge>
+        {/* Waiting on a dependency (derived from depends_on). */}
         {blocked && <span className="pill bg-amber-500/15 text-amber-400"><Lock size={10} /> Blocked</span>}
+        {/* Someone said this is blocked and why. Feeds their EOD report. */}
+        {task.blocked && (
+          <span className="pill bg-red-500/15 text-red-400" title={task.blocker_note ?? undefined}>
+            <Lock size={10} /> {task.blocker_note?.trim() ? task.blocker_note : "Blocked"}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -107,7 +114,7 @@ function Column({ status, label, items, blockedIds, onDelete, onEdit, focusId }:
   );
 }
 
-const BLANK = { title: "", priority: "normal" as Priority, due: "", subtasks: [] as Subtask[], recurrence: "none" as Recurrence, dependsOn: "", clientId: "", assigneeId: "" };
+const BLANK = { title: "", priority: "normal" as Priority, due: "", subtasks: [] as Subtask[], recurrence: "none" as Recurrence, dependsOn: "", clientId: "", assigneeId: "", blockerNote: "" };
 const EMPTY_TASKS: Task[] = [];
 
 export default function Tasks() {
@@ -211,11 +218,11 @@ export default function Tasks() {
 
   function startCreate() { setForm(BLANK); setEditingId(null); setModal(true); }
   function startEdit(t: Task) {
-    setForm({ title: t.title, priority: t.priority, due: t.due_at ? t.due_at.slice(0, 10) : "", subtasks: t.subtasks ?? [], recurrence: t.recurrence ?? "none", dependsOn: t.depends_on ?? "", clientId: clients.find((c) => c.name === t.client_name)?.id ?? "", assigneeId: t.assignee_id ?? "" });
+    setForm({ title: t.title, priority: t.priority, due: t.due_at ? t.due_at.slice(0, 10) : "", subtasks: t.subtasks ?? [], recurrence: t.recurrence ?? "none", dependsOn: t.depends_on ?? "", clientId: clients.find((c) => c.name === t.client_name)?.id ?? "", assigneeId: t.assignee_id ?? "", blockerNote: t.blocker_note ?? "" });
     setEditingId(t.id); setModal(true);
   }
   function fromTemplate(t: TaskTemplate) {
-    setForm({ title: t.title, priority: t.priority, due: "", recurrence: "none", dependsOn: "", clientId: "", assigneeId: "", subtasks: t.subtasks.map((l, i) => ({ id: `${Date.now()}-${i}`, label: l, done: false })) });
+    setForm({ title: t.title, priority: t.priority, due: "", recurrence: "none", dependsOn: "", clientId: "", assigneeId: "", blockerNote: "", subtasks: t.subtasks.map((l, i) => ({ id: `${Date.now()}-${i}`, label: l, done: false })) });
     setEditingId(null); setTemplates(false); setModal(true);
   }
   function submit() {
@@ -225,6 +232,10 @@ export default function Tasks() {
       subtasks: form.subtasks.filter((s) => s.label.trim()), recurrence: form.recurrence, depends_on: form.dependsOn || null,
       client_id: form.clientId || null,
       assignee_id: form.assigneeId || null,
+      // A reason means it's blocked; clearing the reason unblocks it. One field
+      // rather than a checkbox you can leave contradicting the note.
+      blocked: Boolean(form.blockerNote.trim()),
+      blocker_note: form.blockerNote.trim() || null,
     };
     if (editingId) update.mutate({ id: editingId, ...payload });
     else create.mutate(payload);
@@ -362,6 +373,18 @@ export default function Tasks() {
                 {tasks.filter((t) => t.id !== editingId).map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}
               </select>
             </div>
+          </div>
+
+          <div>
+            <label className="field-label" htmlFor="task-blocker">What's blocking this? (optional)</label>
+            <input
+              id="task-blocker"
+              className="input"
+              placeholder="e.g. Waiting on Jordan's copy and enriched list"
+              value={form.blockerNote}
+              onChange={(e) => setForm((f) => ({ ...f, blockerNote: e.target.value }))}
+            />
+            <p className="mt-1 text-[11px] text-faint">Fill this in and the task shows as blocked, and it lands in your EOD report by itself.</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
