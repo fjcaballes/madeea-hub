@@ -1,6 +1,6 @@
 // Product version history — surfaced in the in-app "What's new" page.
 // Bump APP_VERSION and prepend a release whenever something ships.
-export const APP_VERSION = "1.7.0";
+export const APP_VERSION = "1.8.0";
 
 export interface Release {
   version: string;
@@ -10,6 +10,16 @@ export interface Release {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: "1.8.0",
+    date: "2026-07-25",
+    title: "EOD Reports & self-serve password change",
+    changes: [
+      "New EOD Reports page — your end-of-day report is drafted from your Task Manager (completed, blocked, and open tasks), and you review, add notes, and submit. Plus team submission compliance, a blocker feed and a coverage grid.",
+      "Mark a task blocked with a reason on the board — it flags there and rolls into your EOD by itself.",
+      "Change your own password from Settings — no reset email needed. Handy if you were set up with a temporary password: sign in, then set your own.",
+    ],
+  },
   {
     version: "1.7.0",
     date: "2026-07-23",

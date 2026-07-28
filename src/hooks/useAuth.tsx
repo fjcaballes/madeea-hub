@@ -15,6 +15,8 @@ interface AuthState {
   loading: boolean;
   demo: boolean;
   signInWithPassword: (email: string, password: string) => Promise<void>;
+  /** Change the signed-in user's password. Verifies the current one first. */
+  updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -61,6 +63,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!supabase) return;
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+    },
+    async updatePassword(currentPassword, newPassword) {
+      if (!supabase || !user) throw new Error("Password changes aren't available in demo mode.");
+      // Supabase's updateUser does NOT check the old password, so anyone at an
+      // unlocked screen could silently reset it. Re-authenticate first to prove
+      // the current password. This also refreshes the session token.
+      const { error: reauth } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+      if (reauth) throw new Error("Your current password is incorrect.");
+
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw new Error(error.message || "Could not update your password.");
     },
     async signOut() {
       if (supabase) await supabase.auth.signOut();

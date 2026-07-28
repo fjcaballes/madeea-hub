@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PlayCircle, LogOut, ShieldCheck, Sparkles, RotateCcw } from "lucide-react";
+import { PlayCircle, LogOut, ShieldCheck, Sparkles, RotateCcw, KeyRound } from "lucide-react";
 import { PageHeader } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
 import { useTour } from "@/store/tour";
@@ -46,6 +47,8 @@ export default function Settings() {
             </div>
           </div>
         </section>
+
+        <ChangePassword />
 
         {role === "admin" && (
           <section className="card p-5">
@@ -268,5 +271,115 @@ export default function Settings() {
         </section>
       </div>
     </div>
+  );
+}
+
+const MIN_LEN = 8;
+
+/**
+ * Change your own password from inside the app — no reset email needed, which is
+ * what lets a teammate who was set up with a temporary password pick their own.
+ * The current password is required (verified in useAuth) so an unlocked screen
+ * can't be used to take the account over.
+ */
+function ChangePassword() {
+  const { updatePassword, demo } = useAuth();
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // Client-side guards; the server enforces its own minimum too.
+  const tooShort = next.length > 0 && next.length < MIN_LEN;
+  const mismatch = confirm.length > 0 && next !== confirm;
+  const reused = next.length > 0 && next === current;
+  const canSubmit =
+    !demo && current.length > 0 && next.length >= MIN_LEN && next === confirm && next !== current && !saving;
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!canSubmit) return;
+    setSaving(true);
+    setError("");
+    setDone(false);
+    try {
+      await updatePassword(current, next);
+      setDone(true);
+      setCurrent("");
+      setNext("");
+      setConfirm("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not update your password.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="card p-5">
+      <p className="field-label">Password</p>
+      <p className="mb-4 text-sm text-muted">Change the password you use to sign in. You'll need your current one.</p>
+
+      {demo ? (
+        <p className="rounded-lg border border-border bg-surface-2 p-3 text-xs text-faint">
+          Not available in the demo — sign in with a real account to change your password.
+        </p>
+      ) : (
+        <form className="max-w-sm space-y-3" onSubmit={submit}>
+          {/* Present but hidden: gives password managers the account context so
+              "update saved password" works after a change. */}
+          <input type="text" autoComplete="username" className="hidden" tabIndex={-1} aria-hidden="true" />
+          <div>
+            <label className="field-label" htmlFor="pw-current">Current password</label>
+            <input
+              id="pw-current"
+              className="input"
+              type="password"
+              autoComplete="current-password"
+              value={current}
+              onChange={(e) => { setCurrent(e.target.value); setDone(false); setError(""); }}
+            />
+          </div>
+          <div>
+            <label className="field-label" htmlFor="pw-next">New password</label>
+            <input
+              id="pw-next"
+              className="input"
+              type="password"
+              autoComplete="new-password"
+              value={next}
+              onChange={(e) => { setNext(e.target.value); setDone(false); setError(""); }}
+              aria-invalid={tooShort || reused}
+            />
+            <p className="mt-1 text-[11px] text-faint">At least {MIN_LEN} characters.</p>
+          </div>
+          <div>
+            <label className="field-label" htmlFor="pw-confirm">Confirm new password</label>
+            <input
+              id="pw-confirm"
+              className="input"
+              type="password"
+              autoComplete="new-password"
+              value={confirm}
+              onChange={(e) => { setConfirm(e.target.value); setDone(false); setError(""); }}
+              aria-invalid={mismatch}
+            />
+          </div>
+
+          {tooShort && <p className="text-xs text-amber-400">New password must be at least {MIN_LEN} characters.</p>}
+          {reused && <p className="text-xs text-amber-400">Pick a password different from your current one.</p>}
+          {mismatch && <p className="text-xs text-amber-400">The two new passwords don't match.</p>}
+          {error && <p className="rounded-lg border border-red-500/40 bg-red-500/5 p-2.5 text-xs text-red-300">{error}</p>}
+          {done && <p className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-2.5 text-xs text-emerald-300">Password updated. Use it next time you sign in.</p>}
+
+          <button className="btn-primary" type="submit" disabled={!canSubmit}>
+            <KeyRound size={15} />
+            {saving ? "Updating…" : "Update password"}
+          </button>
+        </form>
+      )}
+    </section>
   );
 }
