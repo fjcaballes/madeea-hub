@@ -25,8 +25,19 @@ import type { EodReport } from "@/types/db";
  */
 export const IMPORTED_EOD: EodReport[] = [];
 
+/**
+ * Names from the sheet roster that are now LIVE accounts reporting under their
+ * own profile name. The sheet copy is a stale duplicate — e.g. "Bryan Sumait"
+ * from the July sheet showed as an empty chip next to the real account, which
+ * submits as "Bryansumait Automate". Dropping it here removes the duplicate so
+ * only the live identity shows. Add a name here whenever a sheet person becomes
+ * an account under a different display name (or, alternatively, rename their
+ * profile to match the roster — see supabase/fixes/2026-07-25-canonical-eod-names.sql).
+ */
+const RETIRED_ROSTER_NAMES = new Set<string>(["Bryan Sumait"]);
+
 /** Everyone who has ever reported, in the sheet's column order. */
-export const EOD_PEOPLE: string[] = EOD_DATA.people;
+export const EOD_PEOPLE: string[] = EOD_DATA.people.filter((n) => !RETIRED_ROSTER_NAMES.has(n));
 
 /** Every dated row the sheet defined, so reporting gaps stay visible. */
 export const EOD_DATES: string[] = EOD_DATA.dates;
