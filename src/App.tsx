@@ -30,6 +30,7 @@ import InvestorUpdate from "@/pages/InvestorUpdate";
 import Scoreboard from "@/pages/Scoreboard";
 import Travel from "@/pages/Travel";
 import Notes from "@/pages/Notes";
+import Academy from "@/pages/Academy";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ function Gate() {
     <Routes>
       <Route element={<AppShell />}>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/academy" element={<Academy />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/eod" element={<EodReports />} />
         <Route path="/communication" element={<Communication />} />

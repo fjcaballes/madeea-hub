@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   Settings as SettingsIcon,
   ShieldCheck,
   GraduationCap,
-  Sparkles,
   ChevronLeft,
   ChevronDown,
   Sun,
@@ -62,7 +61,6 @@ function NavScroller({ className, children }: { className?: string; children: Re
 import { NAV } from "@/lib/constants";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyRole } from "@/data/hooks";
-import { useTour } from "@/store/tour";
 import { useUI } from "@/store/ui";
 import { useTheme } from "@/store/theme";
 import { cn } from "@/lib/utils";
@@ -71,7 +69,7 @@ import { cn } from "@/lib/utils";
 export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void; forceExpanded?: boolean }) {
   const { user } = useAuth();
   const { data: role } = useMyRole();
-  const startTour = useTour((s) => s.start);
+  const navigate = useNavigate();
   const { sidebarCollapsed, toggleSidebar } = useUI();
   const { theme, toggle: toggleTheme } = useTheme();
   const groups = ["Operations", "AI Suite", "Second Brain"] as const;
@@ -262,11 +260,11 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         )}
       </NavScroller>
 
-      {/* Academy promo — replays the guided walkthrough of the Command Center. */}
+      {/* Academy promo — opens the MadeEA Academy (walkthrough + playbooks). */}
       <button
         onClick={() => {
           onNavigate?.();
-          startTour();
+          navigate("/academy");
         }}
         className="group mx-3 mb-3 rounded-2xl p-4 text-left shadow-lg transition-transform hover:-translate-y-0.5"
         style={{
@@ -279,11 +277,11 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
           Become a MadeEA Expert
         </div>
         <p className="mb-3 text-[12px] leading-snug text-white/90">
-          Take the guided walkthrough and go from new user to power-user.
+          Learn to navigate the Command Center end to end and go from new user to power-user Pro.
         </p>
         <span className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-white px-3 py-2 text-[13px] font-bold text-[#152e47] transition-transform group-hover:scale-[1.02]">
-          <Sparkles size={14} />
-          Replay tutorial
+          <GraduationCap size={14} />
+          Learn More
         </span>
       </button>
 
