@@ -13,7 +13,7 @@ export function TopBar({ onMenu }: { onMenu?: () => void }) {
   const { theme, toggle } = useTheme();
   const [capturing, setCapturing] = useState(false);
   return (
-    <header className="glass flex h-[66px] items-center gap-4 border-b border-border px-4 lg:px-6">
+    <header className="glass relative z-40 flex h-[66px] items-center gap-4 border-b border-border px-4 lg:px-6">
       <button className="btn-ghost lg:hidden -ml-2" onClick={onMenu} aria-label="Open menu">
         <Menu size={18} />
       </button>

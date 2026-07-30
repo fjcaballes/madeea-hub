@@ -51,11 +51,11 @@ export function Modal({ open, onClose, children }: { open: boolean; onClose: () 
       aria-modal="true"
     >
       <div
-        className="card w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 relative"
+        className="modal-panel w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl p-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          className="absolute top-4 right-4 text-faint hover:text-zinc-100"
+          className="absolute top-4 right-4 text-faint hover:text-text"
           onClick={onClose}
           aria-label="Close"
         >
