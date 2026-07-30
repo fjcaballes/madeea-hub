@@ -357,7 +357,21 @@
     -webkit-backdrop-filter: blur(22px) saturate(1.35);
     backdrop-filter: blur(22px) saturate(1.35);
     box-shadow: var(--shadow-card);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
     @apply rounded-2xl;
+  }
+  /* madeea.ai-style container hover — orange glowing border + soft outer/inner
+     glow and a gentle lift. `.no-hover` opts a card out (e.g. static panels). */
+  .card:not(.no-hover):hover {
+    border-color: rgba(253, 88, 17, 0.4);
+    box-shadow:
+      0 0 40px rgba(253, 88, 17, 0.16),
+      inset 0 0 30px rgba(253, 88, 17, 0.04),
+      var(--shadow-card);
+    transform: translateY(-4px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card:not(.no-hover):hover { transform: none; }
   }
   .glass {
     background: var(--glass);
