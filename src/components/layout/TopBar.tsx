@@ -13,10 +13,16 @@ export function TopBar({ onMenu }: { onMenu?: () => void }) {
   const { theme, toggle } = useTheme();
   const [capturing, setCapturing] = useState(false);
   return (
+    <>
     <header className="glass relative z-40 flex h-[66px] items-center gap-4 border-b border-border px-4 lg:px-6">
       <button className="btn-ghost lg:hidden -ml-2" onClick={onMenu} aria-label="Open menu">
         <Menu size={18} />
       </button>
+      {/* Logo for mobile — the sidebar (which normally carries it) is hidden below lg. */}
+      <div className="flex items-center lg:hidden">
+        <img src="/logo-light.png" alt="MadeEA" className="h-6 w-auto [[data-theme=light]_&]:hidden" />
+        <img src="/logo-dark.png" alt="MadeEA" className="hidden h-6 w-auto [[data-theme=light]_&]:block" />
+      </div>
       <span className="hidden sm:block text-sm font-medium text-muted">{todayLabel()}</span>
       <div className="ml-auto flex items-center gap-2">
         <div className="hidden items-center gap-2 sm:flex" data-tour="search">
@@ -53,8 +59,12 @@ export function TopBar({ onMenu }: { onMenu?: () => void }) {
         </button>
         <Notifications />
       </div>
-
-      <VoiceCapture open={capturing} onClose={() => setCapturing(false)} />
     </header>
+
+    {/* Rendered OUTSIDE the header: the header's backdrop-filter would otherwise
+        become the containing block for this modal's `position: fixed`, trapping
+        it inside the 66px bar. Out here it centers over the whole viewport. */}
+    <VoiceCapture open={capturing} onClose={() => setCapturing(false)} />
+    </>
   );
 }

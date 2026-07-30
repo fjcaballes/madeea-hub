@@ -45,7 +45,7 @@ export function Modal({ open, onClose, children }: { open: boolean; onClose: () 
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-[80] flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-md"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
