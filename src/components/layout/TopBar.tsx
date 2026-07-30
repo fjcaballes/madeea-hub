@@ -18,11 +18,13 @@ export function TopBar({ onMenu }: { onMenu?: () => void }) {
       <button className="btn-ghost lg:hidden -ml-2" onClick={onMenu} aria-label="Open menu">
         <Menu size={18} />
       </button>
-      {/* Logo for mobile — the sidebar (which normally carries it) is hidden below lg. */}
-      <div className="flex items-center lg:hidden">
-        <img src="/logo-light.png" alt="MadeEA" className="h-6 w-auto [[data-theme=light]_&]:hidden" />
-        <img src="/logo-dark.png" alt="MadeEA" className="hidden h-6 w-auto [[data-theme=light]_&]:block" />
-      </div>
+      {/* Logo for mobile — the sidebar (which normally carries it) is hidden below
+          lg. Use the compact square icon so it never gets squeezed by the flex row. */}
+      <img
+        src="/icon.png"
+        alt="MadeEA"
+        className="h-7 w-7 shrink-0 object-contain lg:hidden"
+      />
       <span className="hidden sm:block text-sm font-medium text-muted">{todayLabel()}</span>
       <div className="ml-auto flex items-center gap-2">
         <div className="hidden items-center gap-2 sm:flex" data-tour="search">

@@ -167,6 +167,24 @@
 /* Page entrance — content fades up on route change. */
 .page-enter { animation: fadeUp 0.4s ease both; }
 
+/* Sidebar link switching — active bar grows, item slides in, icon pops. */
+@keyframes navItemIn {
+  0% { transform: translateX(-5px); opacity: 0.45; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes navBarIn {
+  0% { transform: translateY(-50%) scaleY(0); }
+  100% { transform: translateY(-50%) scaleY(1); }
+}
+@keyframes navPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-item.active, .nav-item.active::before, .nav-item.active > svg { animation: none !important; }
+}
+
 /* Hide scrollbar but keep scrollability (used by the sidebar nav). */
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { width: 0; height: 0; display: none; }
@@ -357,17 +375,35 @@
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
   .nav-item {
-    @apply flex items-center gap-3 w-full rounded-xl px-3 py-2 text-sm text-muted transition-colors;
+    @apply relative flex items-center gap-3 w-full rounded-xl px-3 py-2 text-sm text-muted;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.18s ease;
   }
   .nav-item:hover {
     background: var(--chip-bg);
     color: rgb(var(--c-text));
+    transform: translateX(2px);
   }
   .nav-item.active {
     background: var(--nav-active-bg);
     color: var(--nav-active-text);
     @apply font-semibold;
+    animation: navItemIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
+  /* Growing accent bar on the active link — slides in when selection changes. */
+  .nav-item.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 56%;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: rgb(var(--c-accent));
+    transform: translateY(-50%);
+    animation: navBarIn 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* Icon pops when its link becomes active. */
+  .nav-item.active > svg { animation: navPop 0.34s cubic-bezier(0.22, 1, 0.36, 1); }
   .display {
     @apply font-display font-extrabold tracking-tight;
   }
