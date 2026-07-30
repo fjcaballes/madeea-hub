@@ -368,6 +368,8 @@
   /* Glass panels — translucent, blurred, sitting over the ambient layer. */
   .card {
     position: relative;
+    /* Allow cards to shrink inside flex/grid tracks (prevents mobile overflow). */
+    min-width: 0;
     background: var(--glass);
     border: 1px solid var(--c-border);
     -webkit-backdrop-filter: blur(22px) saturate(1.35);
