@@ -9,8 +9,15 @@ const LOGICAL = 126;
 // Many more particles than orbit keyframes (60) — extras reuse orbits with
 // distinct durations/delays so the cloud looks dense without new keyframes.
 const COUNT = 300;
+// Deterministic pseudo-random so each particle keeps a stable size/shade.
+const rand = (n: number) => {
+  const x = Math.sin(n) * 43758.5453;
+  return x - Math.floor(x);
+};
 const PARTICLES = Array.from({ length: COUNT }, (_, i) => ({
-  hue: 16 + Math.round((i / (COUNT - 1)) * 8),
+  size: (1.8 + rand(i + 1) * 4).toFixed(2), // 1.8 – 5.8px
+  hue: Math.round(8 + rand(i + 7) * 28), // 8 – 36 : deep orange → amber
+  light: Math.round(44 + rand(i + 13) * 34), // 44% – 78%
   duration: (4 + ((i * 7) % 30) / 10).toFixed(2),
   delay: (i * 0.011).toFixed(2),
   orbit: `orbit${(i % 60) + 1}`,
@@ -33,7 +40,9 @@ export function Orb({ size = 44 }: { size?: number }) {
                 key={i}
                 className="orb-particle"
                 style={{
-                  background: `hsl(${p.hue},100%,58%)`,
+                  width: `${p.size}px`,
+                  height: `${p.size}px`,
+                  background: `hsl(${p.hue},100%,${p.light}%)`,
                   animation: `${p.orbit} ${p.duration}s ease-in-out infinite`,
                   animationDelay: `${p.delay}s`,
                 }}
