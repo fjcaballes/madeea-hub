@@ -6,9 +6,9 @@
 // animation drives `transform`, which would otherwise clobber an inline scale
 // and render the orb at full 126px.
 const LOGICAL = 126;
-// More particles than orbit keyframes (60) — extras reuse orbits with distinct
-// durations/delays so the cloud looks denser without new keyframes.
-const COUNT = 110;
+// Many more particles than orbit keyframes (60) — extras reuse orbits with
+// distinct durations/delays so the cloud looks dense without new keyframes.
+const COUNT = 300;
 const PARTICLES = Array.from({ length: COUNT }, (_, i) => ({
   hue: 16 + Math.round((i / (COUNT - 1)) * 8),
   duration: (4 + ((i * 7) % 30) / 10).toFixed(2),
