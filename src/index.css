@@ -159,18 +159,11 @@
   line-height: 1.2;
   padding-bottom: 0.12em;
   width: fit-content;
-  background: linear-gradient(95deg, #fd5811 0%, #ff7a2e 55%, #ff8a3d 100%);
-  filter: drop-shadow(0 2px 14px rgba(253, 88, 17, 0.35));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  /* Solid orange — no gradient. */
+  color: #fd5811;
 }
 [data-theme="light"] .greeting-title {
-  background: linear-gradient(95deg, #c43e06 0%, #e05509 55%, #fd5811 100%);
-  filter: none;
-  -webkit-background-clip: text;
-  background-clip: text;
+  color: #d8480e;
 }
 @media (max-width: 860px) {
   .greeting-title { font-size: 30px; }
