@@ -149,6 +149,50 @@
 }
 
 /* ---------------------------------------------------------------- */
+/* Skeleton loaders — soft placeholder blocks with a shining sweep   */
+/* that travels across while real content is still loading.          */
+/* ---------------------------------------------------------------- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: rgb(var(--c-surface-2));
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  /* The shine — a bright band that sweeps left→right. White reads on both the
+     light (cream) and dark (navy) skeleton bases. */
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.06) 45%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.06) 55%,
+    transparent 100%
+  );
+  animation: skeletonSheen 1.5s ease-in-out infinite;
+}
+[data-theme="light"] .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 45%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0.4) 55%,
+    transparent 100%
+  );
+}
+@keyframes skeletonSheen {
+  100% { transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after { animation: none; }
+}
+
+/* ---------------------------------------------------------------- */
 /* Dashboard greeting — gradient display headline.                   */
 /* ---------------------------------------------------------------- */
 .greeting-title {
@@ -375,10 +419,16 @@
     min-width: 0;
     /* Frosted glass: 50%-opacity surface tint over a blurred backdrop, so the
        ambient background reads through. Uses the surface channel token, so it
-       resolves per theme (white in light, deep navy in dark). */
+       resolves per theme (white in light, deep navy in dark). Blur kept modest
+       (8px) because backdrop-filter re-samples the animated background every
+       frame — a smaller radius keeps that cheap. */
     background: rgb(var(--c-surface) / 0.5);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* Skip compositing (and the backdrop blur) for cards scrolled off-screen.
+       `auto` remembers each card's real size, so the scrollbar doesn't jump. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 200px;
     border: 1px solid var(--c-border);
     box-shadow: var(--shadow-card);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;

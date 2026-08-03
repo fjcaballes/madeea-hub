@@ -11,6 +11,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Plus, Trash2, GripVertical, Pencil, CalendarDays, CheckSquare, Repeat, Lock, X, Copy } from "lucide-react";
 import type { Task, TaskStatus, Priority, Subtask, Recurrence } from "@/types/db";
 import { Badge, PageHeader, Modal } from "@/components/ui";
+import { SkeletonCard } from "@/components/Skeleton";
 import { useTasks, useTaskMutations, useClients } from "@/data/hooks";
 import { useFollowUps } from "@/hooks/useFollowUps";
 import { AssigneePicker, AssigneeAvatar } from "@/components/Assignee";
@@ -317,7 +318,14 @@ export default function Tasks() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-faint">Loading tasks…</p>
+        <div className="grid gap-4 lg:grid-cols-3">
+          {COLUMNS.map((col) => (
+            <div key={col.key} className="space-y-3">
+              <SkeletonCard lines={2} />
+              <SkeletonCard lines={3} />
+            </div>
+          ))}
+        </div>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={() => setActiveId(null)}>
           <div className="grid gap-4 lg:grid-cols-3">

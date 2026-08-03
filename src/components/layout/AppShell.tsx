@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import { PageSkeleton } from "@/components/Skeleton";
 import { AmbientBackground } from "./AmbientBackground";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
@@ -37,9 +39,12 @@ export function AppShell() {
         <div className="flex flex-1 overflow-hidden">
           <main className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden p-4 lg:p-6">
             <GuideCard />
-            {/* Keyed by path so page content fades up on every route change. */}
+            {/* Keyed by path so page content fades up on every route change.
+                Suspense shows the shimmer skeleton while a lazy page chunk loads. */}
             <div key={location.pathname} className="page-enter">
-              <Outlet />
+              <Suspense fallback={<PageSkeleton />}>
+                <Outlet />
+              </Suspense>
             </div>
           </main>
           <MadelineRail />
