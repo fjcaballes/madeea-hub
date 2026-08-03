@@ -32,7 +32,7 @@ export default function Login() {
         <div className="mb-6 text-center">
           <img src="/logo-light.png" alt="MadeEA" className="mx-auto mb-3 h-9 w-auto [[data-theme=light]_&]:hidden" />
           <img src="/logo-dark.png" alt="MadeEA" className="mx-auto mb-3 hidden h-9 w-auto [[data-theme=light]_&]:block" />
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">Command Center</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">Executive OS</p>
         </div>
 
         <form className="space-y-3" onSubmit={submit}>

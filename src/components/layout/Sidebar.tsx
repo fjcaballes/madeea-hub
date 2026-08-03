@@ -190,7 +190,7 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
               wordmark keeps its true aspect ratio in the narrow header row. */}
           <img src="/logo-light.png" alt="MadeEA" className="h-6 w-auto max-w-none [[data-theme=light]_&]:hidden" />
           <img src="/logo-dark.png" alt="MadeEA" className="hidden h-6 w-auto max-w-none [[data-theme=light]_&]:block" />
-          <p className="mt-2 text-[10.5px] font-bold uppercase tracking-[0.22em] text-accent">Command Center</p>
+          <p className="mt-2 text-[10.5px] font-bold uppercase tracking-[0.22em] text-accent">Executive OS</p>
         </div>
         {!forceExpanded && (
           <button
