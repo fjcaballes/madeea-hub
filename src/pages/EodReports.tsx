@@ -365,7 +365,7 @@ export default function EodReports() {
       />
 
       {/* ---------------- KPIs ---------------- */}
-      <div data-tour="eod-kpis" className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <div data-tour="eod-kpis" className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         {kpis.map((kpi, i) => {
           const Icon = KPI_ICONS[i];
           const alert = kpi.label === "Blockers Raised" && stats.totalBlockers > 0;
@@ -761,7 +761,7 @@ function TodayEod({
             ? isToday ? "Your EOD for today" : `Your EOD for ${fmtDate(reportDate)}`
             : isToday ? "Draft today's EOD" : `Draft EOD for ${fmtDate(reportDate)}`}
         </span>
-        <span className="pill ml-2 bg-surface-2 text-faint">
+        <span className="pill bg-surface-2 text-faint">
           {total} {total === 1 ? "item" : "items"} from your board
         </span>
         {existing && <Badge tone="done">Submitted</Badge>}
