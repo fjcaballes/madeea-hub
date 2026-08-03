@@ -425,10 +425,6 @@
     background: rgb(var(--c-surface) / 0.5);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    /* Skip compositing (and the backdrop blur) for cards scrolled off-screen.
-       `auto` remembers each card's real size, so the scrollbar doesn't jump. */
-    content-visibility: auto;
-    contain-intrinsic-size: auto 200px;
     border: 1px solid var(--c-border);
     box-shadow: var(--shadow-card);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
