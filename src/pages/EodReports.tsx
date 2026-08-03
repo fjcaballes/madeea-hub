@@ -761,7 +761,7 @@ function TodayEod({
             ? isToday ? "Your EOD for today" : `Your EOD for ${fmtDate(reportDate)}`
             : isToday ? "Draft today's EOD" : `Draft EOD for ${fmtDate(reportDate)}`}
         </span>
-        <span className="pill bg-surface-2 text-faint">
+        <span className="pill ml-2 bg-surface-2 text-faint">
           {total} {total === 1 ? "item" : "items"} from your board
         </span>
         {existing && <Badge tone="done">Submitted</Badge>}
